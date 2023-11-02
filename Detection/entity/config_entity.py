@@ -20,11 +20,11 @@ class DataIngestionConfig:
         training_pipeline_config.artifacts_dir, DATA_INGESTION_DIR_NAME
     )
 
-    feature_store_file_path: str = os.path.join(
-        data_ingestion_dir, DATA_INGESTION_FEATURE_STORE_DIR
-    )
+    # feature_store_file_path: str = os.path.join(
+    #     data_ingestion_dir, DATA_INGESTION_FEATURE_STORE_DIR
+    #)
 
-    data_download_url: str = DATA_DOWNLOAD_URL
+    #data_download_url: str = DATA_DOWNLOAD_URL
 
 
 

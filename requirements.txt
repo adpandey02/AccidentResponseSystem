@@ -8,6 +8,7 @@ flask
 
 # YOLOv8 requirements
 ultralytics
+roboflow
 
 # Usage: pip install -r requirements.txt
 

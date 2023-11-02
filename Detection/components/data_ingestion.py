@@ -70,7 +70,7 @@ class DataIngestion:
             #feature_store_path = self.extract_zip_file(zip_file_path)
 
             data_ingestion_artifact = DataIngestionArtifact(
-                download_file_path = download_file_path
+                data_zip_file_path = download_file_path
                 #feature_store_path = feature_store_path
             )
 

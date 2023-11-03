@@ -24,17 +24,31 @@ class ModelTrainer:
         try:
             logging.info("start training")
             
-            os.system(f"yolo task=detect mode=train model=yolo8s.pt data=D:\projects\DL\AccidentResponseSystem\artifacts\data_ingestion\data.yaml epochs={self.model_trainer_config.no_epochs} imgsz=640")
+            #custom train the model
+            os.system(f"yolo task=detect mode=train model=yolov8s.pt data=D:\\projects\\DL\\AccidentResponseSystem\\artifacts\\data_ingestion\\data.yaml epochs={self.model_trainer_config.no_epochs} imgsz=640")
+            
+            #create directory to store model trainer artifacts
             os.makedirs(self.model_trainer_config.model_trainer_dir, exist_ok=True)
-            os.system(f"cp runs/detect/train/weights/best.pt {self.model_trainer_config.model_trainer_dir}/")
-            os.system(f"cp runs/detect/train/confusion_matrix.png {self.model_trainer_config.model_trainer_dir}/")
-            os.system(f"cp runs/detect/train/results.png {self.model_trainer_config.model_trainer_dir}/")
-           
+
+            #paths for copying
+            source_model = 'D:\\projects\\DL\AccidentResponseSystem\\runs\\detect\\train\weights\\best.pt'
+            destination_model = f'{self.model_trainer_config.model_trainer_dir}\\'
+            logging.info(f"source-model: {source_model} , destination-model: {destination_model}")
+            source_matrix = 'D:\\projects\\DL\AccidentResponseSystem\\runs\\detect\\train\\confusion_matrix.png'
+            destination_matrix = f'{self.model_trainer_config.model_trainer_dir}\\'
+            logging.info(f"source-matrix: {source_matrix} , destination-matrix: {destination_matrix}")
+
+            # Using the 'copy' command to copy the file
+            logging.info('copying start')
+            os.system(f'copy {source_model} {destination_model}')
+            os.system(f'copy {source_matrix} {destination_matrix}')
+            logging.info('copying complete')
+            #Remove the runs folder created while training yolo
             # os.system("rm -rf runs")
             
 
             model_trainer_artifact = ModelTrainerArtifact(
-                trained_model_file_path=f"{self.model_trainer_config.model_trainer_dir}/best.pt"
+                trained_model_file_path=f"{self.model_trainer_config.model_trainer_dir}\\best.pt"
             )
 
             logging.info("initiate_model_trainer method of ModelTrainer class")

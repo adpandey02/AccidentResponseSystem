@@ -1,6 +1,10 @@
 import sys,os
-from Detection.pipeline.training_pipeline import TrainPipeline
-from Detection.utils.main_utils import decodeImage, encodeImageIntoBase64
+import torch
+import cv2
+from time import time
+import supervision as sv
+# from Detection.pipeline.training_pipeline import TrainPipeline
+# from Detection.utils.main_utils import decodeImage, encodeImageIntoBase64
 from flask import Flask, request, jsonify, render_template,Response
 from flask_cors import CORS, cross_origin
 from Detection.constant.application import APP_HOST, APP_PORT
@@ -15,11 +19,7 @@ class ClientApp:
 
 
 
-@app.route("/train")
-def trainRoute():
-    obj = TrainPipeline()
-    obj.run_pipeline()
-    return "Training Successfull!!" 
+
 
 
 @app.route("/")
@@ -28,35 +28,35 @@ def home():
 
 
 
-@app.route("/predict", methods=['POST','GET'])
-@cross_origin()
-def predictRoute():
-    try:
-        image = request.json['image']
-        decodeImage(image, clApp.filename)
+# @app.route("/predict", methods=['POST','GET'])
+# @cross_origin()
+# def predictRoute():
+#     try:
+#         image = request.json['image']
+#         decodeImage(image, clApp.filename)
 
-        os.system("cd yolov5/ && python detect.py --weights my_model.pt --img 416 --conf 0.5 --source ../data/inputImage.jpg")
+#         os.system("cd yolov5/ && python detect.py --weights my_model.pt --img 416 --conf 0.5 --source ../data/inputImage.jpg")
 
-        opencodedbase64 = encodeImageIntoBase64("yolov5/runs/detect/exp/inputImage.jpg")
-        result = {"image": opencodedbase64.decode('utf-8')}
-        os.system("rm -rf yolov5/runs")
+#         opencodedbase64 = encodeImageIntoBase64("yolov5/runs/detect/exp/inputImage.jpg")
+#         result = {"image": opencodedbase64.decode('utf-8')}
+#         os.system("rm -rf yolov5/runs")
 
-    except ValueError as val:
-        print(val)
-        return Response("Value not found inside  json data")
-    except KeyError:
-        return Response("Key value error incorrect key passed")
-    except Exception as e:
-        print(e)
-        result = "Invalid input"
+#     except ValueError as val:
+#         print(val)
+#         return Response("Value not found inside  json data")
+#     except KeyError:
+#         return Response("Key value error incorrect key passed")
+#     except Exception as e:
+#         print(e)
+#         result = "Invalid input"
 
-    return jsonify(result)
+#     return jsonify(result)
 
 
 
 @app.route("/live", methods=['GET'])
 @cross_origin()
-def predictLive():
+def detectLive():
     try:
         os.system("cd yolov5/ && python detect.py --weights my_model.pt --img 416 --conf 0.5 --source 0")
         os.system("rm -rf yolov5/runs")

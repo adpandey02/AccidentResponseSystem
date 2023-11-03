@@ -2,6 +2,7 @@ from Detection.components.data_ingestion import DataIngestion
 from Detection.components.data_validation import DataValidation
 from Detection.components.model_trainer import ModelTrainer
 import sys, os
+import yaml
 from Detection.logger import logging
 from Detection.exception import AppException
 
@@ -85,9 +86,28 @@ class RuntimeTests:
             raise AppException(e, sys)
 
 
-tester = RuntimeTests()
-data_ingestion_artifact_testrun = tester.start_data_ingestion()
-data_validation_artifact = tester.start_data_validation(data_ingestion_artifact_testrun)
-if data_validation_artifact.validation_status == True:
-    model_trainer_artifact = tester.start_model_trainer()
+# tester = RuntimeTests()
+# data_ingestion_artifact_testrun = tester.start_data_ingestion()
+# data_validation_artifact = tester.start_data_validation(data_ingestion_artifact_testrun)
+# if data_validation_artifact.validation_status == True:
+#     model_trainer_artifact = tester.start_model_trainer()
 
+
+# updating yaml
+
+
+def correct_paths_in_yaml(yaml_file_path):
+    # Load the YAML file
+    with open(yaml_file_path, 'r') as file:
+        config = yaml.safe_load(file)
+
+    # Update parameters
+    config['test'] = 'D:\\projects\\DL\\AccidentResponseSystem\\artifacts\\data_ingestion\\test\\images'
+    config['train'] = 'D:\\projects\\DL\\AccidentResponseSystem\\artifacts\\data_ingestion\\train\\images'
+    config['val'] = 'D:\\projects\\DL\\AccidentResponseSystem\\artifacts\\data_ingestion\\valid\\images'
+
+    # Write the updated content back to the file
+    with open(yaml_file_path, 'w') as file:
+        yaml.dump(config, file)
+
+#correct_paths_in_yaml('testing.yaml')

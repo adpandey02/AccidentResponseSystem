@@ -4,7 +4,7 @@ from Detection.exception import AppException
 from Detection.components.data_ingestion import DataIngestion
 from Detection.components.data_validation import DataValidation
 from Detection.components.model_trainer import ModelTrainer
-
+from Detection.utils.main_utils import correct_paths_in_yaml
 
 from Detection.entity.config_entity import (DataIngestionConfig,
                                                  DataValidationConfig,
@@ -35,11 +35,13 @@ class TrainPipeline:
             )
 
             data_ingestion_artifact = data_ingestion.initiate_data_ingestion()
+            
             logging.info("Got the data from URL")
             logging.info(
                 "Exited the start_data_ingestion method of TrainPipeline class"
             )
-
+            
+            correct_paths_in_yaml(f'{data_ingestion_artifact.data_zip_file_path}\data.yaml')
             return data_ingestion_artifact
 
         except Exception as e:
@@ -89,23 +91,33 @@ class TrainPipeline:
         
         
 
-        
-
-    
-
-    def run_pipeline(self) -> None:
+    def run_pipeline_ingest_and_validate(self) -> None:
         try:
             data_ingestion_artifact = self.start_data_ingestion()
             data_validation_artifact = self.start_data_validation(
                 data_ingestion_artifact=data_ingestion_artifact
             )
 
-            if data_validation_artifact.validation_status == True:
-                model_trainer_artifact = self.start_model_trainer()
-            
-            else:
-                raise Exception("Your data is not in correct format")
-
+            return data_validation_artifact
         
         except Exception as e:
             raise AppException(e, sys)
+
+
+    def run_pipeline_train_model(self,data_validation_artifact:DataValidationArtifact) -> None:
+            try:
+
+                if data_validation_artifact.validation_status == True:
+                    model_trainer_artifact = self.start_model_trainer()
+                
+                else:
+                    raise Exception("Your data is not in correct format")
+
+            except Exception as e:
+                raise AppException(e, sys)
+        
+
+trainer = TrainPipeline()
+data_validation_artifact =  trainer.run_pipeline_ingest_and_validate()
+#trainer.run_pipeline_train_model(DataValidationArtifact(
+#                validation_status=True))

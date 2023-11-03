@@ -31,7 +31,7 @@ class DataValidation:
         try:
             validation_status = None
 
-            all_files = os.listdir(self.data_ingestion_artifact.feature_store_path)
+            all_files = os.listdir(self.data_ingestion_artifact.data_zip_file_path)
 
             for file in all_files:
                 if file not in self.data_validation_config.required_file_list:
@@ -64,8 +64,8 @@ class DataValidation:
             logging.info("Exited initiate_data_validation method of DataValidation class")
             logging.info(f"Data validation artifact: {data_validation_artifact}")
 
-            if status:
-                shutil.copy(self.data_ingestion_artifact.data_zip_file_path, os.getcwd())
+            # if status:
+            #     shutil.copy(self.data_ingestion_artifact.data_zip_file_path, os.getcwd())
 
             return data_validation_artifact
 

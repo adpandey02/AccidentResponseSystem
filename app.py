@@ -1,14 +1,15 @@
 import sys,os
-import torch
-import cv2
-from time import time
-from ultralytics import YOLO
+# import torch
+# import cv2
+# from time import time
+# from ultralytics import YOLO
 from Detection.exception import AppException
-import supervision as sv
+# import supervision as sv
 from flask import Flask, request, jsonify, render_template,Response
 from flask_cors import CORS, cross_origin
 from Detection.constant.application import APP_HOST, APP_PORT
-
+from Detection.utils.main_utils import Responses
+from Detection.utils.main_utils import AccidentDetector
 
 app = Flask(__name__)
 CORS(app)
@@ -18,96 +19,16 @@ class ClientApp:
         self.filename = "inputImage.jpg"
 
 
-
-
+# responsse parameters
+# response_obj = Responses()
+# camera_latitude = 28.56234651631763
+# camera_longitude = 77.28039429363223
+# incident_type = "accident"
 
 
 @app.route("/")
 def home():
     return render_template("index.html")
-
-
-
-class AccidentDetector:
-
-    def __init__(self, capture_index):
-        self.capture_index = capture_index
-        self.email_sent = False
-        self.notification_posted = False
-        self.device = 'cuda' if torch.cuda.is_available() else "cpu"
-        print(f'using device : {self.device}')
-        self.model = self.load_model()
-        self.CLASS_NAMES_DICT = self.model.model.names
-        self.box_annotator = sv.BoxAnnotator(color=sv.ColorPalette.default(), thickness=3, text_thickness=3)
-
-    
-    def load_model(self):
-        model = YOLO('D:\\projects\\DL\\AccidentResponseSystem\\artifacts\\model_trainer\\best.pt')
-        model.fuse()
-        return model
-    
-
-    def predict(self, frame):
-        results = self.model(frame)
-        return results
-    
-
-    def plot_bboxes(self, results, frame):
-
-        xyxys = []
-        confidences = []
-        class_ids = []
-
-        # extract detection for accidents
-        for result in results[0]:
-            class_id = result.boxes.cls.cpu().numpy().astype(int)
-
-            if class_id == 0:
-                xyxys.append(result.boxes.xyxy.cpu().numpy())
-                confidences.append(result.boxes.conf.cpu().numpy())
-                class_ids.append(class_id)
-
-
-        # setup detections for visualization
-
-        detections = sv.Detections.from_ultralytics(results[0])
-        frame = self.box_annotator.annotate(scene=frame, detections=detections)
-        return frame, class_ids
-    
-
-    def begin(self):
-
-        cap = cv2.VideoCapture(self.capture_index)
-        cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-
-
-        while True:
-
-            ret, frame = cap.read()
-            results = self.predict(frame)
-            frame, class_ids = self.plot_bboxes(results, frame)
-
-            # logic checks to prevent too many emails and notifications spamming 
-            if len(class_ids) > 0:
-                if not self.email_sent or not self.notification_posted:
-
-                    ### write function to send email and notification here --@Abeer-- , i am writing passing for now ###
-                    
-                    self.email_sent = True
-                    self.notification_posted = True
-            else:
-                self.email_sent = False 
-                self.notification_posted = False          #reset flag when no accident is detected 
-
-            cv2.imshow('accident detection', frame)
-
-            if cv2.waitKey(5) & 0xFF == ord('q'):
-                break
-
-        cap.release()
-        cv2.destroyAllWindows()
-
 
 
 # camera opening route

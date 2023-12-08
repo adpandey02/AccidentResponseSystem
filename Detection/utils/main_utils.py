@@ -87,39 +87,42 @@ class AccidentDetector:
 
     def begin(self):
 
+        response_obj = Responses()
         cap = cv2.VideoCapture(self.capture_index)
         cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
         cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
-        start_time = time.time()
-        prediction_interval = 10
+        #start_time = time.time()
+        #prediction_interval = 10
         while True:
 
             ret, frame = cap.read()
-
-            elapsed_time = time.time() - start_time
-            if elapsed_time >= prediction_interval:
-                results = self.predict(frame)
-                frame, class_ids = self.plot_bboxes(results, frame)
+            #elapsed_time = time.time() - start_time
+            #if elapsed_time >= prediction_interval:    
+            results = self.predict(frame)
+            frame, class_ids = self.plot_bboxes(results, frame)
 
             # logic checks to prevent too many emails and notifications spamming 
             
-                if len(class_ids) > 0:
-                    if not self.email_sent or not self.notification_posted:
+            if len(class_ids) > 0:
+                if not self.email_sent or not self.notification_posted:
 
-                        ### write function to send email and notification here --@Abeer-- , i am writing passing for now ###
-                        #result = response_obj.get_incident_details(camera_latitude, camera_longitude, incident_type)
+                    ### send email and notification here
+                    camera_latitude = 28.56234651631763
+                    camera_longitude = 77.28039429363223
+                    incident_type = "accident"
+                    result = response_obj.get_incident_details(camera_latitude, camera_longitude, incident_type)
 
-                        self.email_sent = True
-                        self.notification_posted = True
+                    self.email_sent = True
+                    self.notification_posted = True
                         
-                else:
-                    self.email_sent = False 
-                    self.notification_posted = False          #reset flag when no accident is detected 
+            else:
+                self.email_sent = False 
+                self.notification_posted = False          #reset flag when no accident is detected 
 
                     
-                cv2.imshow('accident detection', frame)
-                start_time = time.time()
+            cv2.imshow('accident detection', frame)
+                #start_time = time.time()
 
             if cv2.waitKey(5) & 0xFF == ord('q'):
                 break
@@ -312,7 +315,7 @@ class Responses:
         Your Emergency Notification System
         '''
 
-#         self.send_email(subject, message, email_address)
+        self.send_email(subject, message, email_address)
         print(f"Email sent to {service_name}")
 
     def get_collection_name(self, service_type):

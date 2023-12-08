@@ -62,5 +62,10 @@ ipython  # interactive notebook
 # albumentations>=1.0.3
 # pycocotools>=2.0.6  # COCO mAP
 
+#location finding
+pymongo
+geopy
+geocoder
+twilio
 
 -e .
